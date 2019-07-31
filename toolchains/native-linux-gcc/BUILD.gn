@@ -1,0 +1,25 @@
+# real projects use a template as in
+# https://chromium.googlesource.com/chromium/src/build.git/+/refs/heads/master/toolchain/gcc_toolchain.gni
+# and then use this template.
+
+toolchain("native-linux-gcc") {
+  tool("cxx") {
+      depfile = "{{output}}.d"
+      depsformat = "gcc"
+      precompiled_header_type = "gcc"
+      command = "g++ -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+      description = "Compile c++ code {{source}} to {{output}}"
+      outputs = [ "{{source_name_part}}.o", ]
+  }
+
+  tool("link") {
+      exename = "{{target_output_name}}{{output_extension}}"
+      #outfile = "{{output_dir}}/$exename" # TODO: output to correct folder?
+
+      command = "g++ {{ldflags}} -o {{output}} {{inputs}} {{solibs}} {{libs}}"
+      # Note: if 'ld' is used, -lstdc++ is missing
+      description = "Link libraries {{inputs}} {{solibs}} {{libs}} to {{output}}"
+      outputs = [ "$exename", ]
+    }
+
+}
